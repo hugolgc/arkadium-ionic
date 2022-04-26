@@ -1,0 +1,7 @@
+{
+  "name": "arkadium-app",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue"
+}
