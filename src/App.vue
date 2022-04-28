@@ -1,18 +1,22 @@
-<template>
-  <ion-app>
-    <ion-router-outlet />
-  </ion-app>
-</template>
+<script>
+import { RouterView } from 'vue-router'
 
-<script lang="ts">
-import { IonApp, IonRouterOutlet } from '@ionic/vue';
-import { defineComponent } from 'vue';
-
-export default defineComponent({
+export default {
   name: 'App',
   components: {
-    IonApp,
-    IonRouterOutlet
+    RouterView
   }
-});
+}
 </script>
+
+<template>
+  <router-view />
+</template>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap');
+
+* {
+  font-family: 'Montserrat', sans-serif;
+}
+</style>

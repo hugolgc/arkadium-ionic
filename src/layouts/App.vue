@@ -1,0 +1,92 @@
+<script>
+import { RouterView, useRouter, useRoute } from 'vue-router'
+
+export default {
+  name: 'AppLayout',
+  components: {
+    RouterView
+  },
+  data: () => ({
+    router: useRouter(),
+    route: useRoute()
+  })
+}
+</script>
+
+<template>
+  <main class="h-screen flex flex-col bg-black overflow-hidden">
+    <header class="z-10 h-[86px] flex flex-none items-center px-9 text-white">
+      <div class="flex items-center space-x-2.5 ml-auto">
+        <p class="text-[12px] font-semibold">HUGOLGC</p>
+        <div class="h-[30px] w-[30px] bg-white rounded-full"></div>
+      </div>
+    </header>
+    <router-view />
+  </main>
+  <footer class="z-30 fixed bottom-0 left-0 right-0 bg-white rounded-t-[32px] body-shadow">
+    <nav class="h-[90px] flex justify-evenly items-center">
+      <div
+        @click="router.push({ name: 'Home' })"
+        :class="route.name === 'Home' ? 'relative text-black' : 'text-grey-dark'"
+        class="duration-200"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+        </svg>
+        <span
+          v-show="route.name === 'Home'"
+          class="absolute -bottom-2 left-1/2 -translate-x-1/2 h-[2px] w-2.5 rounded-full bg-red"
+        ></span>
+      </div>
+      <div
+        @click="router.push({ name: 'Games' })"
+        :class="route.name === 'Game' ? 'relative text-black' : 'text-grey-dark'"
+        class="duration-200"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+        </svg>
+        <span
+          v-show="route.name === 'Game'"
+          class="absolute -bottom-2 left-1/2 -translate-x-1/2 h-[2px] w-2.5 rounded-full bg-red"
+        ></span>
+      </div>
+      <div
+        @click="router.push({ name: 'Tournaments' })"
+        :class="route.name === 'Tournaments' ? 'relative text-black' : 'text-grey-dark'"
+        class="duration-200"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+        </svg>
+        <span
+          v-show="route.name === 'Tournaments'"
+          class="absolute -bottom-2 left-1/2 -translate-x-1/2 h-[2px] w-2.5 rounded-full bg-red"
+        ></span>
+      </div>
+      <div
+        @click="router.push({ name: 'Standings' })"
+        :class="route.name === 'Standings' ? 'relative text-black' : 'text-grey-dark'"
+        class="duration-200"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        <span
+          v-show="route.name === 'Standings'"
+          class="absolute -bottom-2 left-1/2 -translate-x-1/2 h-[2px] w-2.5 rounded-full bg-red"
+        ></span>
+      </div>
+    </nav>
+  </footer>
+</template>
+
+<style>
+footer nav div {
+  margin: 0 0 12px;
+}
+
+.body-shadow {
+  box-shadow: 0px -18px 36px -9px rgba(0, 0, 0, .08);
+}
+</style>
