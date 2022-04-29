@@ -2,8 +2,10 @@
 import { useRouter } from 'vue-router'
 import { useGamesStore } from '../stores/games'
 import { usePlayersStore } from '../stores/players'
+import { useAvatarsStore } from '../stores/avatars'
 import { gamesServices } from '../services/games'
 import { playersService } from '../services/players'
+import { contentHelper } from '../helpers/content'
 import GameCard from '../components/GameCard.vue'
 
 export default {
@@ -14,7 +16,9 @@ export default {
   data: () => ({
     router: useRouter(),
     gamesStore: useGamesStore(),
-    playersStore: usePlayersStore()
+    playersStore: usePlayersStore(),
+    avatarsStore: useAvatarsStore(),
+    helper: contentHelper
   }),
   methods: {
     async getGames() {
@@ -26,12 +30,6 @@ export default {
       const players = await playersService.getAll()
       if (players === 'error') return
       this.playersStore.players = players
-    },
-    getPositionStyle(position) {
-      if (position === 0) return 'text-red'
-      if (position === 1) return 'text-orange'
-      if (position === 2) return 'text-blue'
-      return 'text-grey-dark'
     }
   },
   async mounted() {
@@ -46,7 +44,10 @@ export default {
     <section>
       <div class="flex justify-between items-center px-9 pt-[54px] pb-[42px]">
         <h1 class="text-blue-dark text-[30px] font-bold">👾 Jeux</h1>
-        <button class="h-9 w-9 flex bg-blue-dark rounded-full text-white">
+        <button
+          @click="router.push({ name: 'Games' })"
+          class="h-9 w-9 flex bg-blue-dark rounded-full text-white"
+        >
           <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7 m-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
           </svg>
@@ -60,7 +61,7 @@ export default {
         />
       </div>
     </section>
-    <section v-if="playersStore.players.length" class="px-9">
+    <section class="px-9">
       <div class="flex justify-between items-center pb-8">
         <h2 class="text-[26px] text-blue-dark font-bold">🏆 Classement</h2>
         <button
@@ -68,18 +69,32 @@ export default {
           class="h-[34px] px-5 border border-grey rounded-full text-[10px] text-blue-dark font-bold"
         >Voir plus</button>
       </div>
-      <ul class="pb-[110px] space-y-5">
+      <ul v-if="playersStore.players.length" class="pb-[110px] space-y-5">
         <li
-          v-for="(player, index) in playersStore.getByScore().slice(0, 5)"
+          v-for="player in playersStore.getByScore().slice(0, 5)"
           :key="player.id"
           class="flex items-center"
         >
-          <div class="h-[42px] w-[42px] mr-2.5 bg-grey rounded-full"></div>
+          <div
+            v-if="avatarsStore.avatars.length"
+            :style="{ borderColor: avatarsStore.getOne(player.fields.avatar[0]).fields.couleur }"
+            class="mr-2.5 p-[2px] border-2 rounded-full"
+          >
+            <img
+              :src="avatarsStore.getOne(player.fields.avatar[0]).fields.image[0].url"
+              class="h-8 w-8"
+            />
+          </div>
           <div class="space-y-1">
             <h3 class="font-semibold">{{ player.fields.pseudo }}</h3>
             <p class="text-[12px] text-grey-dark font-medium">
-              <span :class="getPositionStyle(index)">{{ player.fields.victoires }} Victoires</span>
-              • {{ player.fields.tournois ? player.fields.tournois.length : 0 }} Tournois
+              <span
+                :style="{ color: avatarsStore.getOne(player.fields.avatar[0]).fields.couleur }"
+                class="font-semibold"
+              >
+                {{ player.fields.victoires }} victoire{{ helper.getPlural(player.fields.victoires) }}
+              </span>
+              • {{ player.fields.tournois ? player.fields.tournois.length : 0 }} tournoi{{ helper.getPlural(player.fields.tournois ? player.fields.tournois.length : 0) }}
             </p>
           </div>
           <p class="ml-auto font-semibold">{{ player.fields.points }}</p>

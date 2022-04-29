@@ -1,6 +1,9 @@
 <script>
 import { RouterView, useRouter, useRoute } from 'vue-router'
+import { avatarsService } from '../services/avatars'
+import { useAvatarsStore } from '../stores/avatars'
 import { useUserStore } from '../stores/user'
+
 
 export default {
   name: 'AppLayout',
@@ -10,8 +13,19 @@ export default {
   data: () => ({
     router: useRouter(),
     route: useRoute(),
-    userStore: useUserStore()
-  })
+    userStore: useUserStore(),
+    avatarsStore: useAvatarsStore()
+  }),
+  methods: {
+    async getAvatars() {
+      const avatars = await avatarsService.getAll()
+      if (avatars === 'error') return
+      this.avatarsStore.avatars = avatars
+    }
+  },
+  async mounted() {
+    await this.getAvatars()
+  }
 }
 </script>
 
@@ -20,7 +34,12 @@ export default {
     <header class="z-10 h-[86px] flex flex-none items-center px-9 text-white">
       <div class="flex items-center space-x-2.5 ml-auto">
         <p class="text-[12px] font-semibold uppercase">{{ userStore.user.fields.pseudo }}</p>
-        <div class="h-[30px] w-[30px] bg-white rounded-full"></div>
+        <div
+          v-if="avatarsStore.avatars.length"
+          class="h-8 w-8 p-[3px] border border-white rounded-full"
+        >
+          <img :src="avatarsStore.getOne(userStore.user.fields.avatar[0]).fields.image[0].url" />
+        </div>
       </div>
     </header>
     <router-view />

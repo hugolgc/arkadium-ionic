@@ -1,11 +1,13 @@
 <script>
 import { useRouter } from 'vue-router'
+import { contentHelper } from '../helpers/content'
 
 export default {
   name: 'GameCard',
   props: ['game'],
   data: () => ({
-    router: useRouter()
+    router: useRouter(),
+    helper: contentHelper
   })
 }
 </script>
@@ -21,7 +23,10 @@ export default {
   >
     <div class="h-[208px] w-[152px] flex flex-col justify-end px-4 py-6 space-y-3.5">
       <h2 class="text-white font-bold uppercase">{{ game.fields.nom }}</h2>
-      <p class="text-[12px] text-white/80 font-medium">12 tournois</p>
+      <p class="text-[12px] text-white/80 font-medium">
+        {{ game.fields.tournois ? game.fields.tournois.length : 0 }}
+        tournoi{{ helper.getPlural(game.fields.tournois ? game.fields.tournois.length : 0) }}
+      </p>
     </div>
   </article>
 </template>
