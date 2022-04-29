@@ -24,11 +24,12 @@ export default {
       if (player === 'not found') return
 
       this.userStore.user = player
-      // this.router.push({ name: 'Home' })
+      this.router.push({ name: 'Home' })
     }
   },
   async mounted() {
     // await this.loginUser()
+    setTimeout(() => this.userStore.load = false, 2000)
   }
 }
 </script>

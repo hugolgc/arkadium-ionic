@@ -17,7 +17,7 @@ export default {
       boxShadow: '0px 6px 0px ' + game.fields.couleur + 'D9, 0px 6px 0px black, 0 24px 32px -8px ' + game.fields.couleur
     }"
     @click="router.push({ name: 'Game', params: { id: game.id }})"
-    class="flex-none rounded-[16px] overflow-hidden duration-200"
+    class="flex-none rounded-[16px] overflow-hidden duration-200 snap-start scroll-ml-9"
   >
     <div class="h-[208px] w-[152px] flex flex-col justify-end px-4 py-6 space-y-3.5">
       <h2 class="text-white font-bold uppercase">{{ game.fields.nom }}</h2>
