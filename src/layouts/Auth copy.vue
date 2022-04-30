@@ -1,6 +1,7 @@
 <script>
 import { RouterView, useRouter } from 'vue-router'
-import { usePlayersStore } from '../stores/players'
+import { useUserStore } from '../stores/user'
+import { playersService } from '../services/players'
 
 export default {
   name: 'AuthLayout',
@@ -11,23 +12,24 @@ export default {
     RouterView
   },
   data: () => ({
-    loading: true,
     router: useRouter(),
-    playersStore: usePlayersStore()
+    userStore: useUserStore()
   }),
   methods: {
     async loginUser() {
-      const player = this.playersStore.findOne('hugo@test.fr', '----')
-      this.loading = false
+      const player = await playersService.findOne('lagache.hugo@hotmail.fr', '----')
+      this.userStore.load = false
+      
+      if (player === 'error') return alert('Connectez-vous à internet pour utiliser notre application')
+      if (player === 'not found') return
 
-      if (!player) return
-      this.playersStore.player = player
+      this.userStore.user = player
       this.router.push({ name: 'Home' })
     }
   },
   async mounted() {
-    await this.playersStore.fetchAll()
-    await this.loginUser()
+    // await this.loginUser()
+    setTimeout(() => this.userStore.load = false, 2000)
   }
 }
 </script>
@@ -35,7 +37,7 @@ export default {
 <template>
   <main class="relative h-screen flex flex-col justify-between px-9 pt-32 pb-20 bg-grey-light overflow-hidden">
     <Transition>
-      <div v-if="loading" class="absolute inset-0 flex bg-grey-light">
+      <div v-if="userStore.load" class="absolute inset-0 flex bg-grey-light">
         <img
           @click="router.push({ name: 'Index' })"
           src="../assets/logo.png"

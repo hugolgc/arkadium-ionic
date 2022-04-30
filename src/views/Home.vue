@@ -3,13 +3,11 @@ import { useRouter } from 'vue-router'
 import { useGamesStore } from '../stores/games'
 import { usePlayersStore } from '../stores/players'
 import { useAvatarsStore } from '../stores/avatars'
-import { gamesServices } from '../services/games'
-import { playersService } from '../services/players'
 import { contentHelper } from '../helpers/content'
 import GameCard from '../components/GameCard.vue'
 
 export default {
-  name: "HomeView",
+  name: 'HomeView',
   components: {
     GameCard
   },
@@ -20,21 +18,12 @@ export default {
     avatarsStore: useAvatarsStore(),
     helper: contentHelper
   }),
-  methods: {
-    async getGames() {
-      const games = await gamesServices.getAll()
-      if (games === 'error') return
-      this.gamesStore.games = games
-    },
-    async getPlayers() {
-      const players = await playersService.getAll()
-      if (players === 'error') return
-      this.playersStore.players = players
-    }
-  },
   async mounted() {
-    await this.getGames()
-    await this.getPlayers()
+    console.log('ok')
+    await this.playersStore.fetchAll()
+    console.log('okok')
+    await this.gamesStore.fetchAll()
+    console.log('okokok')
   }
 }
 </script>
@@ -53,7 +42,7 @@ export default {
           </svg>
         </button>
       </div>
-      <div class="flex px-9 pb-16 space-x-4 snap-x snap-mandatory overflow-x-auto">
+      <div v-if="gamesStore.games.length" class="flex px-9 pb-16 space-x-4 snap-x snap-mandatory overflow-x-auto">
         <GameCard
           v-for="game in gamesStore.games"
           :key="game.id"
@@ -69,14 +58,16 @@ export default {
           class="h-[34px] px-5 border border-grey rounded-full text-[10px] text-blue-dark font-bold"
         >Voir plus</button>
       </div>
-      <ul v-if="playersStore.players.length" class="pb-[110px] space-y-5">
+      <ul
+        v-if="playersStore.players.length && avatarsStore.avatars.length"
+        class="pb-[110px] space-y-5"
+      >
         <li
           v-for="player in playersStore.getByScore().slice(0, 5)"
           :key="player.id"
           class="flex items-center"
         >
           <div
-            v-if="avatarsStore.avatars.length"
             :style="{ borderColor: avatarsStore.getOne(player.fields.avatar[0]).fields.couleur }"
             class="mr-2.5 p-[2px] border-2 rounded-full"
           >

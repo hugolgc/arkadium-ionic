@@ -1,30 +1,22 @@
 <script>
-import { RouterView, useRouter, useRoute } from 'vue-router'
-import { avatarsService } from '../services/avatars'
+// RouterView, 
+import { useRouter, useRoute } from 'vue-router'
+import { usePlayersStore } from '../stores/players'
 import { useAvatarsStore } from '../stores/avatars'
-import { useUserStore } from '../stores/user'
-
 
 export default {
   name: 'AppLayout',
   components: {
-    RouterView
+    // RouterView
   },
   data: () => ({
     router: useRouter(),
     route: useRoute(),
-    userStore: useUserStore(),
+    playersStore: usePlayersStore(),
     avatarsStore: useAvatarsStore()
   }),
-  methods: {
-    async getAvatars() {
-      const avatars = await avatarsService.getAll()
-      if (avatars === 'error') return
-      this.avatarsStore.avatars = avatars
-    }
-  },
   async mounted() {
-    await this.getAvatars()
+    await this.avatarsStore.fetchAll()
   }
 }
 </script>
@@ -33,12 +25,12 @@ export default {
   <main class="h-screen flex flex-col bg-black overflow-hidden">
     <header class="z-10 h-[86px] flex flex-none items-center px-9 text-white">
       <div class="flex items-center space-x-2.5 ml-auto">
-        <p class="text-[12px] font-semibold uppercase">{{ userStore.user.fields.pseudo }}</p>
+        <p class="text-[12px] font-semibold uppercase">{{ playersStore.player.fields.pseudo }}</p>
         <div
           v-if="avatarsStore.avatars.length"
           class="h-8 w-8 p-[3px] border border-white rounded-full"
         >
-          <img :src="avatarsStore.getOne(userStore.user.fields.avatar[0]).fields.image[0].url" />
+          <img :src="avatarsStore.getOne(playersStore.player.fields.avatar[0]).fields.image[0].url" />
         </div>
       </div>
     </header>

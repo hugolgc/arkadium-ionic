@@ -12,13 +12,8 @@ export default {
     gamesStore: useGamesStore(),
     helper: contentHelper
   }),
-  methods: {
-    getGame(id) {
-      this.game = this.gamesStore.getOne(id)
-    }
-  },
   mounted() {
-    this.getGame(this.route.params.id)
+    this.game = this.gamesStore.getOne(this.route.params.id)
   }
 }
 </script>
