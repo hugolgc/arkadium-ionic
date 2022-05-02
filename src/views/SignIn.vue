@@ -1,9 +1,9 @@
 <script>
 import { useRouter } from 'vue-router' 
 import { useUserStore } from '../stores/user'
-import { playersService } from '../services/players'
 import Input from '../components/Input.vue'
 import Button from '../components/Button.vue'
+import { usePlayersStore } from '../stores/players'
 
 export default {
   name: 'SignIn',
@@ -14,9 +14,11 @@ export default {
   data: () => ({
     email: '',
     password: '',
-    load: false,
+    loading: false,
+    router: useRouter(),
+    playersStore: usePlayersStore(),
     userStore: useUserStore(),
-    router: useRouter()
+    
   }),
   computed: {
     formIsComplete() {
@@ -25,17 +27,14 @@ export default {
   },
   methods: {
     async handleSubmit() {
-      if (!this.formIsComplete || this.load) return
-      this.load = true
+      if (!this.formIsComplete || this.loading) return
+      this.loading = true
       
-      const user = await playersService.findOne(this.email, this.password)
-      this.load = false
+      const player = await this.playersStore.findOne(this.email, this.password)
+      this.loading = false
 
-      if (user === 'not found') return alert("Nous n'avons pas trouvé votre compte")
-      if (user === 'error') return
-
-      this.userStore.user = user
-      // alert('redirection vers Home')
+      if (!player) return alert("Nous n'avons pas trouvé votre compte")
+      this.playersStore.player = player
       this.router.push({ name: 'Home' })
     }
   }
@@ -52,7 +51,7 @@ export default {
       :type="formIsComplete ? 'primary' : 'secondary'"
       @click="handleSubmit()"
     >
-      <span v-if="load" class="block">
+      <span v-if="loading" class="block">
         <svg class="animate-spin h-5 w-5 mx-auto text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-40" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
           <path class="opacity-80" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>

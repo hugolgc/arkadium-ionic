@@ -19,11 +19,8 @@ export default {
     helper: contentHelper
   }),
   async mounted() {
-    console.log('ok')
+    await this.avatarsStore.fetchAll()
     await this.playersStore.fetchAll()
-    console.log('okok')
-    await this.gamesStore.fetchAll()
-    console.log('okokok')
   }
 }
 </script>
@@ -85,7 +82,7 @@ export default {
               >
                 {{ player.fields.victoires }} victoire{{ helper.getPlural(player.fields.victoires) }}
               </span>
-              • {{ player.fields.tournois ? player.fields.tournois.length : 0 }} tournoi{{ helper.getPlural(player.fields.tournois ? player.fields.tournois.length : 0) }}
+              • {{ player.fields.participations }} participation{{ helper.getPlural(player.fields.participations) }}
             </p>
           </div>
           <p class="ml-auto font-semibold">{{ player.fields.points }}</p>

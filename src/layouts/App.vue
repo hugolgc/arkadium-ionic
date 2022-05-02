@@ -1,22 +1,25 @@
 <script>
-// RouterView, 
-import { useRouter, useRoute } from 'vue-router'
+import { RouterView, useRouter, useRoute } from 'vue-router'
 import { usePlayersStore } from '../stores/players'
 import { useAvatarsStore } from '../stores/avatars'
+import { useGamesStore } from '../stores/games'
 
 export default {
   name: 'AppLayout',
   components: {
-    // RouterView
+    RouterView
   },
   data: () => ({
-    router: useRouter(),
     route: useRoute(),
-    playersStore: usePlayersStore(),
-    avatarsStore: useAvatarsStore()
+    router: useRouter(),
+    gamesStore: useGamesStore(),
+    avatarsStore: useAvatarsStore(),
+    playersStore: usePlayersStore()
   }),
   async mounted() {
+    await this.gamesStore.fetchAll()
     await this.avatarsStore.fetchAll()
+    await this.playersStore.fetchAll()
   }
 }
 </script>
@@ -94,12 +97,12 @@ export default {
   </footer>
 </template>
 
-<style>
-footer nav div {
-  margin: 0 0 12px;
+<style scoped>
+footer {
+  box-shadow: 0px -18px 36px -9px rgba(0, 0, 0, .08);
 }
 
-.body-shadow {
-  box-shadow: 0px -18px 36px -9px rgba(0, 0, 0, .08);
+footer nav div {
+  margin: 0 0 12px;
 }
 </style>

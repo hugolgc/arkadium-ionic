@@ -17,7 +17,7 @@ export default {
   }),
   methods: {
     async loginUser() {
-      const player = this.playersStore.findOne('hugo@test.fr', '----')
+      const player = this.playersStore.findOne('hugo@test.fr', '---')
       this.loading = false
 
       if (!player) return
@@ -28,6 +28,7 @@ export default {
   async mounted() {
     await this.playersStore.fetchAll()
     await this.loginUser()
+
   }
 }
 </script>

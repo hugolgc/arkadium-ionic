@@ -20,7 +20,7 @@ export default {
 
 <template>
   <div v-if="game">
-    <div :style="{ background: game.fields.couleur }" class="fixed inset-0" ></div>
+    <div :style="{ background: game.fields.couleur }" class="fixed inset-0"></div>
     <section
       :style="{ background: 'radial-gradient(50% 50% at 50% 50%, ' + game.fields.couleur + '1A 0%, ' + game.fields.couleur + 'CC 100%), url(' + game.fields.image[0].url + ') center / cover' }"
       class="fixed top-0 inset-x-0 h-[458px] flex flex-none flex-col justify-end px-9 py-[84px]"
@@ -49,9 +49,12 @@ export default {
           >Voir plus</button>
         </div>
         <pre>{{ game.fields.tournois }}</pre>
+        
+        <!-- v-for="tournament in game.fields.tournois" -->
+        
         <ul v-if="game.fields.tournois" class="pb-[106px] space-y-5">
           <li
-            v-for="tournament in game.fields.tournois"
+            v-for="tournament in Array(20)"
             :key="tournament"
             class="flex items-center space-x-5"
           >

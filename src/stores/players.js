@@ -15,6 +15,7 @@ export const usePlayersStore = defineStore('players', {
         ],
         victoires: 4,
         email: 'hugo@test.fr',
+        participations: 5,
         points: 86,
         password: '----',
         tournois: [
