@@ -19,7 +19,6 @@ export const contentHelper = {
   },
   getDate(dtoDate) {
     const date = dtoDate.split('-').reverse()
-    console.log(date)
     return `${ date[0] } ${ months[date[1]] }`
   }
 }

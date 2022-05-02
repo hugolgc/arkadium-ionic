@@ -27,20 +27,18 @@ export const useTournamentsStore = defineStore('tournaments', {
     },
     async edit(id, players) {
       this.loading = true
+      const event = new Event('editPlayerTournament')
       try {
-        const tournament = await tournamentsRepository.patch({ records: [{
+        await tournamentsRepository.patch({ records: [{
           id: id,
           fields: { joueurs: players }
         }]})
-        
-        const event = new Event('editPlayerTournament')
-        if (tournament) window.dispatchEvent(event)
-        console.log(tournament)
       } catch (e) {
         console.error(e)
         this.error = e
       } finally {
         this.loading = false
+        window.dispatchEvent(event)
       }
     }
   }

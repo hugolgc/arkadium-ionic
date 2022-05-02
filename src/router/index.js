@@ -38,6 +38,11 @@ const routes = [
         component: () => import('../views/Home.vue')
       },
       {
+        path: 'games',
+        name: 'Games',
+        component: () => import('../views/Games.vue')
+      },
+      {
         path: 'game/:id',
         name: 'Game',
         component: () => import('../views/Game.vue')
@@ -46,6 +51,11 @@ const routes = [
         path: 'tournaments',
         name: 'Tournaments',
         component: () => import('../views/Tournaments.vue')
+      },
+      {
+        path: 'players',
+        name: 'Players',
+        component: () => import('../views/Players.vue')
       }
     ]
   }

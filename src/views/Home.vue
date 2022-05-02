@@ -28,7 +28,7 @@ export default {
 <template>
   <div class="flex-auto bg-white rounded-t-[36px] overflow-y-auto">
     <section>
-      <div class="flex justify-between items-center px-9 pt-[54px] pb-[42px]">
+      <div class="flex justify-between items-center px-9 py-[42px]">
         <h1 class="text-blue-dark text-[30px] font-bold">👾 Jeux</h1>
         <button
           @click="router.push({ name: 'Games' })"

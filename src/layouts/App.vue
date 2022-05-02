@@ -3,6 +3,7 @@ import { RouterView, useRouter, useRoute } from 'vue-router'
 import { usePlayersStore } from '../stores/players'
 import { useAvatarsStore } from '../stores/avatars'
 import { useGamesStore } from '../stores/games'
+import { useTournamentsStore } from '../stores/tournaments'
 
 export default {
   name: 'AppLayout',
@@ -14,12 +15,14 @@ export default {
     router: useRouter(),
     gamesStore: useGamesStore(),
     avatarsStore: useAvatarsStore(),
-    playersStore: usePlayersStore()
+    playersStore: usePlayersStore(),
+    tournamentsStore: useTournamentsStore()
   }),
   async mounted() {
     await this.gamesStore.fetchAll()
     await this.avatarsStore.fetchAll()
     await this.playersStore.fetchAll()
+    await this.tournamentsStore.fetchAll()
   }
 }
 </script>
@@ -56,14 +59,14 @@ export default {
       </div>
       <div
         @click="router.push({ name: 'Games' })"
-        :class="route.name === 'Game' ? 'relative text-black' : 'text-grey-dark'"
+        :class="route.name === 'Game' || route.name === 'Games' ? 'relative text-black' : 'text-grey-dark'"
         class="duration-200"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
         </svg>
         <span
-          v-show="route.name === 'Game'"
+          v-show="route.name === 'Game' || route.name === 'Games'"
           class="absolute -bottom-2 left-1/2 -translate-x-1/2 h-[2px] w-2.5 rounded-full bg-red"
         ></span>
       </div>
