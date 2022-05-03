@@ -41,10 +41,17 @@ export default {
       </div>
       <div v-if="gamesStore.games.length" class="flex px-9 pb-16 space-x-4 snap-x snap-mandatory overflow-x-auto">
         <GameCard
-          v-for="game in gamesStore.games"
+          v-for="game in gamesStore.games.slice(0, 5)"
           :key="game.id"
           :game="game"
         />
+      </div>
+      <div v-else class="flex px-9 pb-16 space-x-4 overflow-hidden">
+        <div
+          v-for="item in Array(4)"
+          :key="item"
+          class="skeleton h-[208px] w-[152px] flex-none bg-grey-light rounded-[16px]"
+        ></div>
       </div>
     </section>
     <section class="px-9">
@@ -88,6 +95,48 @@ export default {
           <p class="ml-auto font-semibold">{{ player.fields.points }}</p>
         </li>
       </ul>
+      <div v-else class="pb-[110px] space-y-5">
+        <div
+          v-for="item in Array(6)"
+          :key="item"
+          class="flex items-center"
+        >
+          <div class="skeleton h-10 w-10 bg-grey-light rounded-full"></div>
+          <div class="ml-2.5 mr-auto space-y-1">
+            <div class="skeleton h-[16px] w-[20vw] bg-grey-light rounded-full"></div>
+            <div class="skeleton h-[16px] w-[40vw] bg-grey-light rounded-full"></div>
+          </div>
+          <div class="skeleton h-6 w-8 bg-grey-light rounded-full"></div>
+        </div>
+      </div>
     </section>
   </div>
 </template>
+
+<style>
+.skeleton {
+  position: relative;
+  overflow: hidden;
+}
+
+.skeleton::before {
+  content: '';
+  display: block;
+  position: absolute;
+  left: -150px;
+  top: 0;
+  height: 100%;
+  width: 150px;
+  background: linear-gradient(to right, transparent 0%, #E8E8E8 50%, transparent 100%);
+  animation: load 1s cubic-bezier(0.4, 0.0, 0.2, 1) infinite;
+}
+
+@keyframes load {
+  from {
+    left: -150px;
+  }
+  to   {
+    left: 100%;
+  }
+}
+</style>
