@@ -19,6 +19,10 @@ export default {
     tournamentsStore: useTournamentsStore()
   }),
   async mounted() {
+    if (!this.playersStore.player) {
+      this.router.push({ name: 'Index' })
+    }
+
     await this.gamesStore.fetchAll()
     await this.avatarsStore.fetchAll()
     await this.playersStore.fetchAll()
@@ -28,7 +32,7 @@ export default {
 </script>
 
 <template>
-  <main class="h-screen flex flex-col bg-black overflow-hidden">
+  <main v-if="playersStore.player" class="h-screen flex flex-col bg-black overflow-hidden">
     <header class="z-10 h-[86px] flex flex-none items-center px-9 text-white">
       <div class="flex items-center space-x-2.5 ml-auto">
         <p class="text-[12px] font-semibold uppercase">{{ playersStore.player.fields.pseudo }}</p>

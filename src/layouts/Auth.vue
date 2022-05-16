@@ -1,5 +1,7 @@
 <script>
+import { Storage } from '@ionic/storage'
 import { RouterView, useRouter } from 'vue-router'
+import { useAvatarsStore } from '../stores/avatars'
 import { usePlayersStore } from '../stores/players'
 
 export default {
@@ -13,22 +15,40 @@ export default {
   data: () => ({
     loading: true,
     router: useRouter(),
-    playersStore: usePlayersStore()
+    storage: new Storage(),
+    playersStore: usePlayersStore(),
+    avatarsStore: useAvatarsStore()
   }),
   methods: {
     async loginUser() {
-      const player = this.playersStore.findOne('hugo@test.fr', '---')
-      this.loading = false
+      if (!await this.storage.length()) {
+        this.loading = false
+        return
+      }
 
-      if (!player) return
+      const email = await this.storage.get('email')
+      const password = await this.storage.get('password')
+      const player = this.playersStore.findOne(email, password)
+
+      if (!player) {
+        this.loading = false
+        await this.storage.clear()
+        return
+      }
+
       this.playersStore.player = player
       this.router.push({ name: 'Home' })
     }
   },
   async mounted() {
-    await this.playersStore.fetchAll()
-    await this.loginUser()
+    if (this.playersStore.player) {
+      this.router.push({ name: 'Home' })
+    }
 
+    await this.storage.create()
+    await this.playersStore.fetchAll()
+    await this.avatarsStore.fetchAll()
+    await this.loginUser()
   }
 }
 </script>

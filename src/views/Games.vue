@@ -29,6 +29,7 @@ export default {
       > 
         <figure class="space-y-7">
           <img
+            @click="router.push({ name: 'Game', params: { id: game.id }})"
             :src="game.fields.image[0].url"
             class="aspect-video object-cover rounded-[8px]"
           />

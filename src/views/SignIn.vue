@@ -1,9 +1,9 @@
 <script>
 import { useRouter } from 'vue-router' 
-import { useUserStore } from '../stores/user'
+import { Storage } from '@ionic/storage'
+import { usePlayersStore } from '../stores/players'
 import Input from '../components/Input.vue'
 import Button from '../components/Button.vue'
-import { usePlayersStore } from '../stores/players'
 
 export default {
   name: 'SignIn',
@@ -17,8 +17,7 @@ export default {
     loading: false,
     router: useRouter(),
     playersStore: usePlayersStore(),
-    userStore: useUserStore(),
-    
+    storage: new Storage()
   }),
   computed: {
     formIsComplete() {
@@ -34,9 +33,14 @@ export default {
       this.loading = false
 
       if (!player) return alert("Nous n'avons pas trouvé votre compte")
+      this.storage.set('email', this.email)
+      this.storage.set('password', this.password)
       this.playersStore.player = player
       this.router.push({ name: 'Home' })
     }
+  },
+  async mounted() {
+    await this.storage.create()
   }
 }
 </script>
@@ -46,7 +50,10 @@ export default {
   <div>
     <Input v-model="email" type="email" label="EMAIL" />
     <Input v-model="password" type="password" label="MOT DE PASSE" :isVisible="true" />
-    <p class="mt-8 text-pink-light text-[10px] font-semibold">MOT DE PASSE OUBLIÉ ?</p>
+    <p
+      @click="router.push({ name: 'SignUp' })"
+      class="mt-8 text-pink-light text-[10px] font-semibold"
+    >PAS ENCORE INSCRIT ?</p>
     <Button
       :type="formIsComplete ? 'primary' : 'secondary'"
       @click="handleSubmit()"

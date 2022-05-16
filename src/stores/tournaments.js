@@ -10,6 +10,10 @@ export const useTournamentsStore = defineStore('tournaments', {
     error: null
   }),
   getters: {
+    getByDate: state => () => state.tournaments.sort((a, b) => {
+      let dateA = new Date(a.fields.date), dateB = new Date(b.fields.date)
+      return dateA - dateB
+    }),
     getOne: state => id => state.tournaments.find(tournament => tournament.id === id)
   },
   actions: {
