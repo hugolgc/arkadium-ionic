@@ -4,6 +4,8 @@ import { usePlayersStore } from '../stores/players'
 import { useAvatarsStore } from '../stores/avatars'
 import { useGamesStore } from '../stores/games'
 import { useTournamentsStore } from '../stores/tournaments'
+import { usePreferencesStore } from '../stores/preferences'
+import { useReservationsStore } from '../stores/reservations'
 
 export default {
   name: 'AppLayout',
@@ -16,7 +18,10 @@ export default {
     gamesStore: useGamesStore(),
     avatarsStore: useAvatarsStore(),
     playersStore: usePlayersStore(),
-    tournamentsStore: useTournamentsStore()
+    tournamentsStore: useTournamentsStore(),
+    preferencesStore: usePreferencesStore(),
+    reservationsStore: useReservationsStore()
+
   }),
   async mounted() {
     if (!this.playersStore.player) {
@@ -27,6 +32,8 @@ export default {
     await this.avatarsStore.fetchAll()
     await this.playersStore.fetchAll()
     await this.tournamentsStore.fetchAll()
+    await this.preferencesStore.fetchAll()
+    await this.reservationsStore.fetchAll()
   }
 }
 </script>
@@ -50,14 +57,14 @@ export default {
     <nav class="h-[90px] flex justify-evenly items-center">
       <div
         @click="router.push({ name: 'Home' })"
-        :class="route.name === 'Home' ? 'relative text-black' : 'text-grey-dark'"
+        :class="route.name === 'Home' || route.name === 'Players' ? 'relative text-black' : 'text-grey-dark'"
         class="duration-200"
       >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
           <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
         </svg>
         <span
-          v-show="route.name === 'Home'"
+          v-show="route.name === 'Home' || route.name === 'Players'"
           class="absolute -bottom-2 left-1/2 -translate-x-1/2 h-[2px] w-2.5 rounded-full bg-red"
         ></span>
       </div>
@@ -87,7 +94,7 @@ export default {
           class="absolute -bottom-2 left-1/2 -translate-x-1/2 h-[2px] w-2.5 rounded-full bg-red"
         ></span>
       </div>
-      <div
+      <!-- <div
         @click="router.push({ name: 'Players' })"
         :class="route.name === 'Players' ? 'relative text-black' : 'text-grey-dark'"
         class="duration-200"
@@ -97,6 +104,19 @@ export default {
         </svg>
         <span
           v-show="route.name === 'Players'"
+          class="absolute -bottom-2 left-1/2 -translate-x-1/2 h-[2px] w-2.5 rounded-full bg-red"
+        ></span>
+      </div> -->
+      <div
+        @click="router.push({ name: 'Room' })"
+        :class="route.name === 'Room' ? 'relative text-black' : 'text-grey-dark'"
+        class="duration-200"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />
+        </svg>
+        <span
+          v-show="route.name === 'Room'"
           class="absolute -bottom-2 left-1/2 -translate-x-1/2 h-[2px] w-2.5 rounded-full bg-red"
         ></span>
       </div>

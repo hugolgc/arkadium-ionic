@@ -1,23 +1,23 @@
 import { defineStore } from 'pinia'
 import { Repository } from '../repository'
 
-const planningsRepository = Repository('plannings')
+const preferencesRepository = Repository('preferences')
 
-export const usePlanningsStore = defineStore('plannings', {
+export const usePreferencesStore = defineStore('preferences', {
   state: () => ({
-    plannings: [],
+    preferences: null,
     loading: false,
     error: null
   }),
   getters: {
-    getOne: state => id => state.plannings.find(planning => planning.id === id)
+    getOne: state => id => state.preferences.find(preference => preference.id === id)
   },
   actions: {
     async fetchAll() {
       this.loading = true
       try {
-        const { records } = await planningsRepository.get()
-        this.plannings = records
+        const { records } = await preferencesRepository.get()
+        this.preferences = records[0].fields
       } catch (e) {
         console.error(e)
         this.error = e
