@@ -34,6 +34,17 @@ export default {
         return
       }
 
+      if (this.debut && !this.fin && this.debut === hourFormat) {
+        this.debut = null
+        return
+      }
+
+      if (this.debut && this.fin && this.fin === hourFormat) {
+        this.debut = null
+        this.fin = null
+        return
+      }
+
       if (this.debut && !this.fin) {
         this.fin = hourFormat
         return
@@ -48,25 +59,39 @@ export default {
       const hourFormat = hour.format('YYYY-MM-DDTHH:mm:00')
 
       if (
-        this.getMomentDaySelected().day() === 1 ||
-        hour.isBefore() ||
-        this.reservationsOfTheDay.find(reservation => hourFormat === reservation.fields.debut.split('.')[0]) ||
-        this.reservationsOfTheDay.map(reservation => hour.isBetween(reservation.fields.debut.split('.')[0], reservation.fields.fin.split('.')[0])).includes(true)
-      ) return 'text-blue-dark/25 pointer-events-none'
+        this.reservationsOfTheDay.find(reservation => reservation.fields.debut.split('.')[0] === hourFormat && hourFormat.includes('15:00:00')) ||
+        this.reservationsOfTheDay.find(reservation => reservation.fields.fin.split('.')[0] === hourFormat && hourFormat.includes('01:00:00')) ||
+        this.reservationsOfTheDay.map(reservation => hour.isBetween(
+          reservation.fields.debut.split('.')[0],
+          reservation.fields.fin.split('.')[0],
+        )).includes(true)
+      ) return 'text-blue-dark/25 border border-transparent pointer-events-none'
       
-      if (this.debut && hour.isBefore(this.debut)) return 'text-blue-dark/25 pointer-events-none'
-      
+      if (
+        this.reservationsOfTheDay.find(reservation => reservation.fields.debut.split('.')[0] === hourFormat) &&
+        this.reservationsOfTheDay.find(reservation => reservation.fields.fin.split('.')[0] === hourFormat)
+      ) return 'text-blue-dark/25 border border-transparent pointer-events-none'
+
+      if (this.debut && hour.isBefore(this.debut)) return 'text-blue-dark/25 border border-transparent pointer-events-none'
+
+      if (
+        this.debut &&
+        this.reservationsOfTheDay.filter(reservation => moment(reservation.fields.debut.split('.')[0]).isBetween(this.debut, hourFormat)).length
+      ) return 'text-blue-dark/25 border border-transparent pointer-events-none'
+
       if (hourFormat === this.debut || hourFormat === this.fin) return 'border border-blue-dark'
-      
-      return 'text-blue-dark cursor-pointer'
+
+      return 'text-blue-dark border border-transparent cursor-pointer'
     }
   },
   computed: {
     reservationsOfTheDay() {
-      return this.reservationsStore.reservations.filter(reservation => reservation.fields.debut.includes(this.daySelected))
+      const startDay = `${ this.daySelected }T02:00:00`
+      const endDay = moment(startDay).add(28, 'hour').format('YYYY-MM-DDTHH:mm:00')
+      return this.reservationsStore.reservations.filter(reservation => moment(reservation.fields.debut.split('.')[0]).isBetween(startDay, endDay))
     },
     buttonStyle() {
-      return { type: 'primary', text: 'Je valide Samedi de 13:00 à 18:00' }
+      return { type: 'primary', value: 'Je valide Samedi de 13:00 à 18:00' }
     },
     hours() {
       return [...Array(21)].map((el, index) => (index / 2 + 15 === 25.5) ? null : this.getMomentDaySelected().add(index / 2 + 15, 'hours'))
@@ -74,6 +99,7 @@ export default {
   },
   mounted() {
     this.reservationsStore.fetchAll()
+    setTimeout(() => console.log(this.reservationsOfTheDay), 2000)
   }
 }
 </script>
@@ -114,7 +140,7 @@ export default {
           class="p-2.5 bg-grey-light rounded-[8px] text-center text-[12px] font-medium"
         >{{ hour.format('HH:mm') }}</li>
       </ul>
-      <Button :type="buttonStyle.type" class="rounded-[8px]">{{ buttonStyle.text }}</Button>
+      <Button :type="buttonStyle.type" class="rounded-[8px]">{{ buttonStyle.value }}</Button>
     </div>
   </div>
 </template>
