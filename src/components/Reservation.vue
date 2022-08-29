@@ -1,18 +1,23 @@
 <script>
-import moment from 'moment'
-import Button from './Button.vue'
-import { useReservationsStore } from '../stores/reservations'
+  import { useReservationsStore } from '../stores/reservations'
+  import { usePlayersStore } from '../stores/players'
+  import moment from 'moment'
+  import Button from './Button.vue'
 
 export default {
   name: 'ReservationComponent',
+  props: ['modelValue'],
+  emits: ['update:modelValue'],
   components: {
     Button
   },
   data: () => ({
+    playersStore: usePlayersStore(),
     reservationsStore: useReservationsStore(),
     daySelected: moment().startOf('day').format('YYYY-MM-DD'),
     debut: null,
-    fin: null
+    fin: null,
+    daysOfWeek: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
   }),
   methods: {
     getMomentDaySelected() {
@@ -82,6 +87,18 @@ export default {
       if (hourFormat === this.debut || hourFormat === this.fin) return 'border border-blue-dark'
 
       return 'text-blue-dark border border-transparent cursor-pointer'
+    },
+    async handleSubmit() {
+      if (!this.debut && !this.fin) return
+
+      const handleState = await this.reservationsStore.createOne({
+        joueurs: [this.playersStore.player.id],
+        debut: this.debut,
+        fin: this.fin
+      })
+
+      if (handleState) this.$emit('update:modelValue', false)
+      else alert("Désolé, une erreur est survenue")
     }
   },
   computed: {
@@ -91,7 +108,9 @@ export default {
       return this.reservationsStore.reservations.filter(reservation => moment(reservation.fields.debut.split('.')[0]).isBetween(startDay, endDay))
     },
     buttonStyle() {
-      return { type: 'primary', value: 'Je valide Samedi de 13:00 à 18:00' }
+      if (this.debut && !this.fin) return { type: 'secondary', value: 'Choisir une heure de départ' }
+      if (this.debut && this.fin) return { type: 'primary', value: `Je valide ${ this.daysOfWeek[moment(this.debut).day()] } de ${ this.debut.split('T')[1].slice(0, -3) } à ${ this.fin.split('T')[1].slice(0, -3) }` }
+      return { type: 'secondary', value: 'Choisir une heure d\'arrivée' }
     },
     hours() {
       return [...Array(21)].map((el, index) => (index / 2 + 15 === 25.5) ? null : this.getMomentDaySelected().add(index / 2 + 15, 'hours'))
@@ -99,14 +118,19 @@ export default {
   },
   mounted() {
     this.reservationsStore.fetchAll()
-    setTimeout(() => console.log(this.reservationsOfTheDay), 2000)
   }
 }
 </script>
 
 <template>
-  <div class="z-40 fixed inset-0 flex px-[18px]">
-    <div class="absolute inset-0 bg-black/50"></div>
+  <div
+    v-if="modelValue"
+    class="z-40 fixed inset-0 flex px-[18px]"
+  >
+    <div
+      @click="$emit('update:modelValue', false)"
+      class="absolute inset-0 bg-black/50"
+    ></div>
     <div class="z-10 min-h-[290px] w-full m-auto p-[18px] space-y-[18px] bg-white rounded-3xl overflow-y-auto">
       <div class="flex justify-between space-x-[18px]">
         <button
@@ -140,7 +164,12 @@ export default {
           class="p-2.5 bg-grey-light rounded-[8px] text-center text-[12px] font-medium"
         >{{ hour.format('HH:mm') }}</li>
       </ul>
-      <Button :type="buttonStyle.type" class="rounded-[8px]">{{ buttonStyle.value }}</Button>
+      <Button
+        @click="handleSubmit()"
+        :type="buttonStyle.type"
+        :class="reservationsStore.loading ? 'animate-pulse' : ''"
+        class="rounded-[8px]"
+      >{{ buttonStyle.value }}</Button>
     </div>
   </div>
 </template>

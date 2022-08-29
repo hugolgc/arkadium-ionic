@@ -24,6 +24,33 @@ export const useReservationsStore = defineStore('reservations', {
       } finally {
         this.loading = false
       }
+    },
+    async createOne(reservationDto) {
+      this.loading = true
+      try {
+        await reservationsRepository.post({ records: [{ fields: reservationDto }]})
+        await this.fetchAll()
+        return true
+      } catch (e) {
+        console.error(e)
+        this.error = e
+        return false
+      } finally {
+        this.loading = false
+      }
+    },
+    async eraseOne(reservationId) {
+      console.log(reservationId)
+      this.loading = true
+      try {
+        await reservationsRepository.delete(reservationId)
+        this.reservations = this.reservations.filter(reservation => reservation.id !== reservationId)
+      } catch (e) {
+        console.error(e)
+        this.error = e
+      } finally {
+        this.loading = false
+      }
     }
   }
 })

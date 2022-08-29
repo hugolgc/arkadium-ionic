@@ -4,6 +4,7 @@ import { useReservationsStore } from '../stores/reservations'
 import { usePlayersStore } from '../stores/players'
 import Reservation from '../components/Reservation.vue'
 import Button from '../components/Button.vue'
+import moment from 'moment'
 
 export default {
   name: 'RoomView',
@@ -14,8 +15,18 @@ export default {
   data: () => ({
     preferencesStore: usePreferencesStore(),
     reservationsStore: useReservationsStore(),
-    playersStore: usePlayersStore()
+    playersStore: usePlayersStore(),
+    showReservation: false
   }),
+  methods: {
+    dateIsAfter(end) {
+      return moment().isAfter(end, 'minutes')
+    },
+    async handleDelete(reservationId) {
+      if (!confirm('Supprimer cette réservation ?')) return
+      await this.reservationsStore.eraseOne(reservationId)
+    }
+  },
   async mounted() {
     await this.preferencesStore.fetchAll()
     await this.reservationsStore.fetchAll()
@@ -39,6 +50,7 @@ export default {
       class="text-[12px] text-justify text-blue-dark font-medium"
     >{{ preferencesStore.preferences.description }}</p>
     <Button
+      @click="showReservation = true"
       type="primary"
       class="rounded-[8px]"
     >Réserver une séance</Button>
@@ -47,7 +59,11 @@ export default {
       class="mt-5 text-[12px] text-grey-dark text-center italic"
     >Aucune réservation</p>
     <Button
-      v-for="reservation in reservationsStore.reservations.filter(reservation => reservation.fields.joueurs[0] === playersStore.player.id)"
+      v-for="reservation in reservationsStore.reservations.filter(reservation =>
+        reservation.fields.joueurs[0] === playersStore.player.id &&
+        !dateIsAfter(reservation.fields.fin.split('.')[0])
+      )"
+      @click="handleDelete(reservation.id)"
       :key="reservation.id"
       type="secondary"
       class="flex justify-between items-center px-4 rounded-[8px] cursor-default"
@@ -56,5 +72,5 @@ export default {
       <span>{{ reservation.fields.debut.split('T')[1].slice(0, 5) }} - {{ reservation.fields.fin.split('T')[1].slice(0, 5) }}</span>
     </Button>
   </section>
-  <Reservation />
+  <Reservation v-model="showReservation" />
 </template>
