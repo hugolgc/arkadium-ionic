@@ -1,8 +1,10 @@
 <script>
-  import { useReservationsStore } from '../stores/reservations'
-  import { usePlayersStore } from '../stores/players'
-  import moment from 'moment'
-  import Button from './Button.vue'
+import moment from 'moment'
+import Button from './Button.vue'
+import { useReservationsStore } from '../stores/reservations'
+import { usePaymentsStore } from '../stores/payments'
+import { usePlayersStore } from '../stores/players'
+import { usePreferencesStore } from '../stores/preferences'
 
 export default {
   name: 'ReservationComponent',
@@ -13,13 +15,20 @@ export default {
   },
   data: () => ({
     playersStore: usePlayersStore(),
+    paymentsStore: usePaymentsStore(),
     reservationsStore: useReservationsStore(),
+    preferencesStore: usePreferencesStore(),
     daySelected: moment().startOf('day').format('YYYY-MM-DD'),
     debut: null,
     fin: null,
-    daysOfWeek: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi']
+    daysOfWeek: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+    paymentStep: false,
   }),
   methods: {
+    closeModal() {
+      this.paymentStep = false
+      this.$emit('update:modelValue', false)
+    },
     getMomentDaySelected() {
       return moment(this.daySelected, 'YYYY-MM-DD')
     },
@@ -88,20 +97,47 @@ export default {
 
       return 'text-blue-dark border border-transparent cursor-pointer'
     },
-    async handleSubmit() {
+    async showPayment() {
       if (!this.debut && !this.fin) return
-
+      this.paymentStep = true
+      const createPaymentState = await this.paymentsStore.create(this.amountByDuration, `
+        Joueur n°${ this.playersStore.player.id } (${ this.playersStore.player.fields.pseudo }) - réservation
+        le ${ this.daysOfWeek[moment(this.debut).day()] }
+        de ${ this.debut.split('T')[1].slice(0, -3) }
+        à ${ this.fin.split('T')[1].slice(0, -3) }
+      `)
+      
+      if (!createPaymentState) {
+        alert('Une erreur est survenue')
+        this.paymentStep = false
+      }
+    },
+    async handlePayment() {
+      const paymentState = await this.paymentsStore.pay()
+      if (paymentState) this.handleReservation()
+    },
+    async handleReservation() {
       const handleState = await this.reservationsStore.createOne({
         joueurs: [this.playersStore.player.id],
         debut: this.debut,
         fin: this.fin
       })
 
-      if (handleState) this.$emit('update:modelValue', false)
-      else alert("Désolé, une erreur est survenue")
+      if (handleState) {
+        alert('Votre réservation est enregistrée 😃')
+        this.closeModal()
+        return
+      }
+      
+      alert('Nous ne pouvons pas enregistrer votre réservation. Le paiement à bien été pris en compte, contactez nous.')
     }
   },
   computed: {
+    amountByDuration() {
+      if (!this.debut || !this.fin || !this.preferencesStore.preferences) return 0
+      const duration = moment.duration(moment(this.fin).diff(this.debut))
+      return this.preferencesStore.preferences.prix / 60 * duration.asMinutes()
+    },
     reservationsOfTheDay() {
       const startDay = `${ this.daySelected }T02:00:00`
       const endDay = moment(startDay).add(28, 'hour').format('YYYY-MM-DDTHH:mm:00')
@@ -116,8 +152,9 @@ export default {
       return [...Array(21)].map((el, index) => (index / 2 + 15 === 25.5) ? null : this.getMomentDaySelected().add(index / 2 + 15, 'hours'))
     }
   },
-  mounted() {
+  async mounted() {
     this.reservationsStore.fetchAll()
+    this.preferencesStore.fetchAll()
   }
 }
 </script>
@@ -128,11 +165,14 @@ export default {
     class="z-40 fixed inset-0 flex px-[18px]"
   >
     <div
-      @click="$emit('update:modelValue', false)"
+      @click="closeModal()"
       class="absolute inset-0 bg-black/50"
     ></div>
-    <div class="z-10 min-h-[290px] w-full m-auto p-[18px] space-y-[18px] bg-white rounded-3xl overflow-y-auto">
-      <div class="flex justify-between space-x-[18px]">
+    <div class="z-10 min-h-[320px] w-full m-auto p-[18px] space-y-[18px] bg-white rounded-3xl overflow-y-auto">
+      <div
+        v-if="!paymentStep"  
+        class="flex justify-between space-x-[18px]"
+      >
         <button
           @click="setDay(false)"
           class="h-8 w-8 flex-none flex bg-grey-light rounded-full"
@@ -155,7 +195,12 @@ export default {
           </svg>
         </button>
       </div>
-      <ul class="grid grid-cols-4 gap-[9px]">
+
+
+      <ul
+        v-if="!paymentStep"
+        class="grid grid-cols-4 gap-[9px]"
+      >
         <li
           v-for="(hour, key) in hours"
           :key="key"
@@ -164,12 +209,30 @@ export default {
           class="p-2.5 bg-grey-light rounded-[8px] text-center text-[12px] font-medium"
         >{{ hour.format('HH:mm') }}</li>
       </ul>
+
+
       <Button
-        @click="handleSubmit()"
+        v-if="!paymentStep"
+        @click="showPayment()"
         :type="buttonStyle.type"
-        :class="reservationsStore.loading ? 'animate-pulse' : ''"
         class="rounded-[8px]"
       >{{ buttonStyle.value }}</Button>
+
+
+      <form
+        v-if="paymentStep"
+        @submit.prevent="handlePayment()"
+      >
+        <div id="payment-element"></div>
+        <Button
+          type="primary"
+          :class="paymentsStore.loading ? 'animate-pulse' : ''"
+          class="rounded-[8px]"
+        >Payer {{ amountByDuration }}€</Button>
+        <div id="payment-message" class="hidden"></div>
+      </form>
+
+
     </div>
   </div>
 </template>

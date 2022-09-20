@@ -18,6 +18,14 @@ export default {
     playersStore: usePlayersStore(),
     showReservation: false
   }),
+  computed: {
+    reservationAfterNow() {
+      return this.reservationsStore.reservations.filter(reservation =>
+        reservation.fields.joueurs[0] === this.playersStore.player.id &&
+        !this.dateIsAfter(reservation.fields.fin.split('.')[0])
+      )
+    }
+  },
   methods: {
     dateIsAfter(end) {
       return moment().isAfter(end, 'minutes')
@@ -43,7 +51,7 @@ export default {
     <video
       v-if="preferencesStore.preferences"
       :src="preferencesStore.preferences.video[0].url"
-      autoplay muted class="mt-8 mb-5 rounded-[8px]"
+      autoplay muted class="w-full mt-8 mb-5 rounded-[8px]"
     ></video>
     <p
       v-if="preferencesStore.preferences"
@@ -55,19 +63,18 @@ export default {
       class="rounded-[8px]"
     >Réserver une séance</Button>
     <p
-      v-if="!reservationsStore.reservations.length"
+      v-if="!reservationAfterNow.length"
       class="mt-5 text-[12px] text-grey-dark text-center italic"
     >Aucune réservation</p>
     <Button
-      v-for="reservation in reservationsStore.reservations.filter(reservation =>
-        reservation.fields.joueurs[0] === playersStore.player.id &&
-        !dateIsAfter(reservation.fields.fin.split('.')[0])
-      )"
-      @click="handleDelete(reservation.id)"
+      v-for="reservation in reservationAfterNow"
       :key="reservation.id"
       type="secondary"
       class="flex justify-between items-center px-4 rounded-[8px] cursor-default"
     >
+
+      <!-- Button: @click="handleDelete(reservation.id)" -->
+
       <span class="capitalize">{{ new Date(reservation.fields.debut).toLocaleString('fr-FR', { day: 'numeric', weekday: 'long', month: 'short' }) }}</span>
       <span>{{ reservation.fields.debut.split('T')[1].slice(0, 5) }} - {{ reservation.fields.fin.split('T')[1].slice(0, 5) }}</span>
     </Button>
