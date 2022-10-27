@@ -1,4 +1,16 @@
 import { createRouter, createWebHistory } from '@ionic/vue-router'
+import Auth from '../layouts/Auth.vue'
+import App from '../layouts/App.vue'
+import Index from '../views/Index.vue'
+import SignIn from '../views/SignIn.vue'
+import SignUp from '../views/SignUp.vue'
+import Home from '../views/Home.vue'
+import Games from '../views/Games.vue'
+import Game from '../views/Game.vue'
+import Tournaments from '../views/Tournaments.vue'
+import Players from '../views/Players.vue'
+import Planning from '../views/Planning.vue'
+import Room from '../views/Room.vue'
 
 const routes = [
   {
@@ -8,64 +20,64 @@ const routes = [
   {
     path: '/auth',
     name: 'Auth',
-    component: () => import('../layouts/Auth.vue'),
+    component: Auth,
     children: [
       {
         path: '',
         name: 'Index',
-        component: () => import('../views/Index.vue')
+        component: Index
       },
       {
         path: 'signin',
         name: 'SignIn',
-        component: () => import('../views/SignIn.vue')
+        component: SignIn
       },
       {
         path: 'signup',
         name: 'SignUp',
-        component: () => import('../views/SignUp.vue')
+        component: SignUp
       },
     ]
   },
   {
     path: '/app',
     name: 'App',
-    component: () => import('../layouts/App.vue'),
+    component: () => App,
     children: [
       {
         path: '',
         name: 'Home',
-        component: () => import('../views/Home.vue')
+        component: Home
       },
       {
         path: 'games',
         name: 'Games',
-        component: () => import('../views/Games.vue')
+        component: Games
       },
       {
         path: 'game/:id',
         name: 'Game',
-        component: () => import('../views/Game.vue')
+        component: Game
       },
       {
         path: 'tournaments',
         name: 'Tournaments',
-        component: () => import('../views/Tournaments.vue')
+        component: Tournaments
       },
       {
         path: 'players',
         name: 'Players',
-        component: () => import('../views/Players.vue')
+        component: Players
       },
       {
         path: 'planning',
         name: 'Planning',
-        component: () => import('../views/Planning.vue')
+        component: Planning
       },
       {
         path: 'room',
         name: 'Room',
-        component: () => import('../views/Room.vue')
+        component: Room
       }
     ]
   }
